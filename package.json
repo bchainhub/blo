@@ -1,20 +1,25 @@
 {
-  "name": "blo",
+  "name": "@blockchainhub/blo",
   "version": "1.2.0",
-  "license": "MIT",
+  "license": "CORE",
   "author": "Pierre Bertet <hi@bpier.re>",
-  "description": "blo is a small and fast library to generate Ethereum identicons.",
+  "contributors": [
+    "Blockchain Hub @bchainhub"
+  ],
+  "description": "blo is a small and fast library to generate Blockchain identicons.",
   "keywords": [
-    "ethereum",
-    "eth",
+    "core",
+    "blockchain",
+    "xcb",
     "identicon",
     "blockies",
     "web3",
-    "dapps"
+    "dapps",
+    "blo"
   ],
-  "homepage": "https://github.com/bpierre/blo",
-  "bugs": "https://github.com/bpierre/blo/issues",
-  "repository": "github:bpierre/blo",
+  "homepage": "https://github.com/bchainhub/blo",
+  "bugs": "https://github.com/bchainhub/blo/issues",
+  "repository": "github:bchainhub/blo",
   "type": "module",
   "module": "./dist/index.js",
   "main": "./dist/index.cjs",
@@ -29,22 +34,23 @@
   "scripts": {
     "dev": "vite ./demos/react",
     "build": "tsc && vite build",
-    "lint": "eslint '**/*.{ts,tsx}'"
+    "lint": "eslint '**/*.{ts,tsx}'",
+    "ncu-all": "ncu -u && cd demos/bun && ncu -u && cd ../node && ncu -u && cd ../react && ncu -u && cd ../../benchmark && ncu -u"
   },
   "files": [
     "dist"
   ],
   "sideEffects": false,
   "devDependencies": {
-    "@eslint/js": "^9.0.0",
-    "eslint": "^9.0.0",
+    "@eslint/js": "^9.1.1",
+    "eslint": "^9.1.1",
     "eslint-plugin-react-refresh": "^0.4.6",
-    "globals": "^15.0.0",
-    "typescript": "^5.4.4",
-    "typescript-eslint": "^7.5.0",
-    "vite": "^5.2.8",
-    "vite-plugin-dts": "^3.8.1",
-    "vitest": "^1.4.0"
+    "globals": "^15.1.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.8.0",
+    "vite": "^5.2.11",
+    "vite-plugin-dts": "^3.9.0",
+    "vitest": "^1.5.3"
   },
   "engines": {
     "node": ">=16"

@@ -25,4 +25,4 @@ export type PaletteIndex =
 export type Hsl = Uint16Array;
 
 // An Ethereum address.
-export type Address = `0x${string}`;
+export type Address = string;
