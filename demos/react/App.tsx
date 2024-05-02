@@ -1,4 +1,4 @@
-import { blo } from "blo";
+import { blo } from "@blockchainhub/blo";
 import { useState } from "react";
 
 export default function App() {

@@ -1,5 +1,5 @@
 {
-  "name": "blo-benchmark",
+  "name": "@blockchainhub/blo-benchmark",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,24 +8,24 @@
     "bench": "vitest bench"
   },
   "devDependencies": {
-    "@types/react": "^18.2.74",
-    "@types/react-dom": "^18.2.24",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.6.0",
-    "@vitest/browser": "^1.4.0",
+    "@vitest/browser": "^1.5.3",
     "ethereum-blockies-base64": "^1.0.2",
-    "typescript": "^5.4.4",
-    "vite": "^5.2.8",
-    "vitest": "^1.4.0",
-    "webdriverio": "^8.35.1"
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11",
+    "vitest": "^1.5.3",
+    "webdriverio": "^8.36.1"
   },
   "dependencies": {
     "@download/blockies": "^1.0.3",
     "blockies-react-svg": "^0.0.13",
     "blockies-ts": "^1.0.0",
     "rand-seed": "^1.0.2",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "react-blockies": "^1.4.1",
     "react-component-benchmark": "^2.0.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.3.1"
   }
 }

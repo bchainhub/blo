@@ -1,10 +1,8 @@
 <div align="center">
-<img width="860" alt="blo" src="https://github.com/bpierre/blo/assets/36158/7ddc0bf0-076d-4c5a-8624-cc8646e4c5aa">
-  <br><strong>blo</strong> is a small and fast library to generate Ethereum identicons.
+<img width="860" alt="blo" src="https://github.com/bchainhub/blo/assets/537310/5665a666-9dce-4869-9cb9-eb9bcd1693a1">
+  <br><strong>blo</strong> is a small and fast library to generate Blockchain identicons.
   <br><br>
 </div>
-
-<p align=center><a href="https://www.npmjs.com/package/blo"><img src="https://badgen.net/npm/v/blo" alt="npm version"></a> <a href="https://bundlejs.com/?q=blo"><img src="https://deno.bundlejs.com/badge?q=blo" alt="bundle size"></a> <a href="https://github.com/bpierre/blo/blob/main/LICENSE"><img src="https://badgen.net/github/license/bpierre/blo" alt="License"></a></p>
 
 ## Features
 
@@ -34,15 +32,21 @@
 ## Getting Started
 
 ```sh
-npm i -S blo
-pnpm add blo
-yarn add blo
+npm i -S @bchainhub/blo
+```
+
+```sh
+pnpm add @bchainhub/blo
+```
+
+```sh
+yarn add @bchainhub/blo
 ```
 
 ```ts
-import { blo } from "blo";
+import { blo } from "@bchainhub/blo";
 
-img.src = blo("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045");
+img.src = blo("cb7147879011ea207df5b35a24ca6f0859dcfb145999");
 ```
 
 ### React / Vue / Others
@@ -50,7 +54,7 @@ img.src = blo("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045");
 blo is fast enough to not require memoization or async rendering for common use cases.
 
 ```tsx
-function AddressIcon({ address }: { address: `0x${string}` }) {
+function AddressIcon(address: string) {
   return (
     <img
       alt={address}
@@ -73,7 +77,7 @@ The `size` paramater shouldn’t usually be needed, as the image will stay sharp
 Example:
 
 ```ts
-import { blo } from "blo";
+import { blo } from "@bchainhub/blo";
 
 img.src = blo(address); // size inside the SVG defaults to 64px
 img2.src = blo(address, 24); // set it to 24px
@@ -131,7 +135,7 @@ export type PaletteIndex =
 export type Hsl = Uint16Array;
 
 // An Ethereum address.
-export type Address = `0x${string}`;
+export type Address = string;
 ```
 
 ## Acknowledgements
@@ -142,23 +146,23 @@ export type Address = `0x${string}`;
 
 ## FAQ
 
-### Does it follow the exact same algorithm as Etherscan, MetaMask and others?
+### Does it follow the exact same algorithm as CorePass, Etherscan, MetaMask and others?
 
 Yes.
 
-### Does it work with ENS names?
+### Does it work with CNS, ENS names?
 
-No it only works with Ethereum addresses, but you can resolve the ENS name to an address (e.g. with [wagmi](https://wagmi.sh/core/actions/fetchEnsAddress)) and pass the result to blo.
+Yes. You can use the ENS name directly as the `address` parameter.
 
 ### Can blo render other formats than SVG?
 
 You can render to any format you want by using the `bloImage()` function, which returns a data structure (see [API](#api) above). Check out the [Bun](./demos/bun) and [Node](./demos/node) demos for examples of rendering an identicon in the terminal.
 
-<img width="400" src="https://github.com/bpierre/blo/assets/36158/a7c86d01-f003-49d7-8f9e-93097b502872" alt="Ethereum identicon rendered in the terminal">
+<img width="400" src="https://github.com/bchainhub/blo/assets/537310/93243626-ae78-44fb-9201-d6049a3f95e5" alt="Ethereum identicon rendered in the terminal">
 
 ### Can it be used to generate other types of identicons?
 
-blo only focuses on the Ethereum identicons algorithm but you can use it with any data, just prefix it with `0x` to fulfill the expected `Address` type if you are using TypeScript.
+blo focuses on the blockchain algorithm but you can use it with any data. Hexadecimal values prefix it with `0x` to fulfill the expected `Address` otherwise prefix is not needed.
 
 ### Why is it named blo?
 
@@ -166,4 +170,4 @@ blo is short for blockies, which is the name of [the original library](https://g
 
 ## License
 
-[MIT](./LICENSE)
+[CORE](LICENSE)

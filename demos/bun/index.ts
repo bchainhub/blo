@@ -1,4 +1,4 @@
-import { bloImage } from "blo";
+import { bloImage } from "@blockchainhub/blo";
 
 const SQUARE_WIDTH = 3;
 
