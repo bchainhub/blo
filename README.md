@@ -6,7 +6,7 @@
 
 ## Features
 
-- 🐥 **Small**: **[0.76 KB](https://bundlejs.com/?bundle&q=%40blockchainhub%2Fblo)** gzipped.
+- 🐥 **Small**: **[0.665 KB](https://bundlejs.com/?bundle&q=%40blockchainhub%2Fblo)** gzipped.
 - 💥 **Fast**: **[3.5x faster](#library-comparison)** than the second fastest solution.
 - 🔍 **Optimized**: Leverages SVG to generate compact and sharp images at any size.
 - 💆 **Simple**: Focuses on Ethereum identicons only, allowing for a simpler API.
@@ -32,19 +32,19 @@
 ## Getting Started
 
 ```sh
-npm i -S @bchainhub/blo
+npm i -S @blockchainhub/blo
 ```
 
 ```sh
-pnpm add @bchainhub/blo
+pnpm add @blockchainhub/blo
 ```
 
 ```sh
-yarn add @bchainhub/blo
+yarn add @blockchainhub/blo
 ```
 
 ```ts
-import { blo } from "@bchainhub/blo";
+import { blo } from "@blockchainhub/blo";
 
 img.src = blo("cb7147879011ea207df5b35a24ca6f0859dcfb145999");
 ```
@@ -77,7 +77,7 @@ The `size` paramater shouldn’t usually be needed, as the image will stay sharp
 Example:
 
 ```ts
-import { blo } from "@bchainhub/blo";
+import { blo } from "@blockchainhub/blo";
 
 img.src = blo(address); // size inside the SVG defaults to 64px
 img2.src = blo(address, 24); // set it to 24px
