@@ -10,8 +10,7 @@ const SVG_START = `<svg `
 
 export function svg(address: Address, size: number) {
   const random = seedRandom(address.toLowerCase());
-
-  const [b, c, s] = randomPalette(random);
+  const { background: b, primary: c, accent: s } = randomPalette(random);
 
   const paths = [
     `M0,0H8V8H0z`, // background

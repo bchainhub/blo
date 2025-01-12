@@ -2,15 +2,17 @@ import { bloImage } from "@blockchainhub/blo";
 
 const SQUARE_WIDTH = 3;
 
+const paletteKeys = ["background", "primary", "accent"] as const;
+
 function renderImage([data, palette]: ReturnType<typeof bloImage>) {
   let output = "";
   const currentLine: string[] = [];
 
   for (let i = 0; i < data.length; i++) {
     const color = hsl2rgb(
-      palette[data[i]][0],
-      palette[data[i]][1] / 100,
-      palette[data[i]][2] / 100,
+      palette[paletteKeys[data[i]]][0],
+      palette[paletteKeys[data[i]]][1] / 100,
+      palette[paletteKeys[data[i]]][2] / 100,
     );
 
     const [r, g, b] = color.map((c) => Math.floor(c * 255));
@@ -28,7 +30,7 @@ function renderImage([data, palette]: ReturnType<typeof bloImage>) {
   return output;
 }
 
-function renderIcon(address: `0x${string}`) {
+function renderIcon(address: string) {
   console.log(
     renderImage(bloImage(address)),
     `\n${address}`,

@@ -1,4 +1,4 @@
-import type { Address, BloImage, BloImageData, Hsl, PaletteIndex } from "./types";
+import type { Address, BloImage, BloImageData, Hsl, Palette, PaletteIndex } from "./types";
 
 import { seedRandom } from "./random";
 
@@ -28,12 +28,12 @@ export function randomImageData(random: () => number): BloImageData {
   return data;
 }
 
-export function randomPalette(random: () => number): [Hsl, Hsl, Hsl] {
+export function randomPalette(random: () => number): Palette {
   // calls order is significant
-  const c = randomColor(random);
-  const b = randomColor(random);
-  const s = randomColor(random);
-  return [b, c, s];
+  const primary = randomColor(random);
+  const background = randomColor(random);
+  const accent = randomColor(random);
+  return { background, primary, accent };
 }
 
 export function randomColor(rand: () => number): Hsl {
