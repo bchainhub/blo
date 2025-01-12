@@ -45,7 +45,7 @@ const BENCHMARKS: Record<
   string,
   React.ComponentType<{ address: string }>
 > = {
-  "blo": React.memo(({ address }) => (
+  "@blockchainhub/blo": React.memo(({ address }) => (
     <img
       width={64}
       height={64}
