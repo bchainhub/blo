@@ -1,5 +1,5 @@
 import React from "react";
-import type { BenchmarkRef, BenchResultsType } from "react-component-benchmark";
+import type { BenchmarkRef } from "react-component-benchmark";
 
 import { createIcon as blockiesCreateIcon } from "@download/blockies";
 import BlockiesSvgSync from "blockies-react-svg/dist/es/BlockiesSvgSync.mjs";
@@ -9,6 +9,13 @@ import { useRef, useState } from "react";
 import ReactBlockies from "react-blockies";
 import { Benchmark } from "react-component-benchmark";
 import { blo } from "../../src";
+
+const DEBUG = false;
+const debug = (...args: unknown[]) => {
+  if (DEBUG) {
+    console.log(...args);
+  }
+};
 
 const SAMPLES = 1000;
 
@@ -32,32 +39,30 @@ function nextAddress() {
 // which requires to render the raster images at 128x128.
 const BENCHMARKS: Record<
   string,
-  ({ address }: { address: string }) => React.JSX.Element
+  React.ComponentType<{ address: string }>
 > = {
-  "blo": ({ address }) => (
+  "blo": React.memo(({ address }) => (
     <img
       width={64}
       height={64}
       src={blo(address)}
-      alt={`Blockies for ${address}`}
-      style={{ imageRendering: "pixelated" }}
     />
-  ),
-  "ethereum-blockies-base64": ({ address }) => (
+  )),
+  "ethereum-blockies-base64": React.memo(({ address }) => (
     <img
       width={64}
       height={64}
       src={makeBlockie(address)}
     />
-  ),
-  "blockies-react-svg": ({ address }) => (
+  )),
+  "blockies-react-svg": React.memo(({ address }) => (
     <BlockiesSvgSync
       size={8}
       scale={8}
       address={address}
     />
-  ),
-  "@download/blockies": ({ address }) => (
+  )),
+  "@download/blockies": React.memo(({ address }) => (
     <img
       width={64}
       height={64}
@@ -67,8 +72,8 @@ const BENCHMARKS: Record<
         size: 8,
       }).toDataURL()}
     />
-  ),
-  "blockies-ts": ({ address }) => (
+  )),
+  "blockies-ts": React.memo(({ address }) => (
     <img
       width={64}
       height={64}
@@ -78,8 +83,8 @@ const BENCHMARKS: Record<
         size: 8,
       }).toDataURL()}
     />
-  ),
-  "react-blockies": ({ address }) => (
+  )),
+  "react-blockies": React.memo(({ address }) => (
     // className is used to force the display size to 64x64
     <ReactBlockies
       className="react-blockies"
@@ -87,21 +92,21 @@ const BENCHMARKS: Record<
       scale={16}
       size={8}
     />
-  ),
+  )),
 } as const;
+
+interface BenchmarkResult {
+  startTime: number;
+  endTime: number;
+  runTime: number;
+  sampleCount: number;
+  samples: Array<{ start: number; end: number; }>;
+}
 
 export default function App() {
   const [results, setResults] = useState<
-    Record<
-      keyof typeof BENCHMARKS,
-      | null
-      | BenchResultsType & { rps: number }
-    >
-  >(
-    Object.fromEntries(
-      Object.keys(BENCHMARKS).map((key) => [key, null]),
-    ) as Record<keyof typeof BENCHMARKS, null>,
-  );
+    Record<string, null | BenchmarkResult & { rps: number }>
+  >({});
 
   const refs = Object.fromEntries(
     Object.keys(BENCHMARKS).map((name) => [
@@ -135,15 +140,15 @@ export default function App() {
           <tr>
             <th></th>
             <th>Library</th>
-            <th colSpan={3}>Renders per second</th>
+            <th colSpan={2}>Renders per second</th>
+            <th>Preview</th>
           </tr>
         </thead>
         <tbody>
           {Object.entries(BENCHMARKS).map((benchmark) => {
             const [name, Component] = benchmark;
             const result = results[name];
-            const rps = result?.mean ? Math.round(1000 / result.mean) : 0;
-            const score = best > 0 ? (rps / best) : 0;
+            debug(`Processing result for ${name}:`, result);
 
             return (
               <tr key={name}>
@@ -154,11 +159,11 @@ export default function App() {
                 >
                   <div
                     style={{
-                      width: `${score * 100}px`,
+                      width: `${result?.rps ? (result.rps / best) * 100 : 0}px`,
                       height: "8px",
 
                       // 120 = green, 0 = red
-                      background: `hsl(${Math.round(score * 120)}, 50%, 70%)`,
+                      background: `hsl(${result?.rps ? Math.round((result.rps / best) * 120) : 0}, 50%, 70%)`,
                     }}
                   />
                 </td>
@@ -170,9 +175,7 @@ export default function App() {
                     minWidth: "100px",
                   }}
                 >
-                  {rps > 0
-                    ? new Intl.NumberFormat("en-US").format(rps)
-                    : "-"}
+                  {result?.rps ? new Intl.NumberFormat("en-US").format(result.rps) : "-"}
                 </td>
                 <td>
                   <button
@@ -192,24 +195,49 @@ export default function App() {
                     <div className="benchmark">
                       <Benchmark
                         ref={refs[name]}
-                        component={() => <Component address={nextAddress()} />}
-                        onComplete={(result) => {
-                          if (result.mean > 0) {
-                            const rps = 1000 / result.mean;
-                            setResults((r) => ({
-                              ...r,
-                              [name]: { ...result, rps },
-                            }));
+                        component={Component}
+                        componentProps={{ address: nextAddress() }}
+                        onComplete={(benchResult: BenchmarkResult) => {
+                          debug(`Raw benchmark result for ${name}:`, benchResult);
+
+                          // Calculate RPS from total runtime and sample count
+                          const totalTime = benchResult.endTime - benchResult.startTime;
+                          const timePerSample = totalTime / benchResult.sampleCount;
+
+                          debug(`Time calculations for ${name}:`, {
+                            totalTime,
+                            timePerSample,
+                            sampleCount: benchResult.sampleCount
+                          });
+
+                          if (timePerSample > 0) {
+                            const rps = Math.round(1000 / timePerSample);
+                            debug(`Valid result for ${name}, RPS: ${rps}`);
+
+                            setResults(prevResults => {
+                              const newResults = {
+                                ...prevResults,
+                                [name]: {
+                                  ...benchResult,
+                                  mean: timePerSample,
+                                  rps
+                                }
+                              };
+                              debug(`Updated results for ${name}:`, newResults);
+                              return newResults;
+                            });
+                          } else {
+                            debug(`Invalid time per sample for ${name}:`, timePerSample);
                           }
                           setRunning(null);
                         }}
                         samples={SAMPLES}
                         type="mount"
-                        timeout={20000}
+                        timeout={30000}
                       />
                     </div>
                     <div className="sample">
-                      <Component address="cb7147879011ea207df5b35a24ca6f0859dcfb145999" />
+                      <Component address={addresses[0]} />
                     </div>
                   </div>
                 </td>
