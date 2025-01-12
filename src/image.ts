@@ -1,4 +1,4 @@
-import type { Address, BloImage, BloImageData, Hsl, Palette } from "./types";
+import type { Address, BloImage, BloImageData, Hsl, Palette, BloOptions } from "./types";
 import { seedRandom } from "./random";
 
 // Pre-calculate constants
@@ -7,8 +7,9 @@ const SATURATION_BASE = 40;
 const SATURATION_RANGE = 60;
 const LIGHTNESS_DIVISOR = 25;
 
-export function image(address: Address): BloImage {
-  const random = seedRandom(address.toLowerCase());
+export function image(address: Address, options: BloOptions = {}): BloImage {
+  const { seed } = options;
+  const random = seedRandom(seed || address.toLowerCase());
   const palette = randomPalette(random);
   const data = randomImageData(random);
   return [data, palette];

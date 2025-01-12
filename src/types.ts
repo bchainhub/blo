@@ -18,7 +18,7 @@ export const PaletteIndexes = {
   PRIMARY: 1,
   ACCENT: 2,
 } as const;
-export type PaletteIndex = typeof PaletteIndexes[keyof typeof PaletteIndexes];
+export type PaletteIndex = 0 | 1 | 2;
 
 // A color in the HSL color space.
 // [0]: 0-360 (hue)
@@ -35,12 +35,18 @@ export type ValidSize = number;
 // export type ValidSize = 16 | 32 | 64 | 128 | 256;
 
 // Function signatures with improved type safety
-export type BloFunction = (address: Address, uppercase?: boolean | null, size?: ValidSize) => string;
-export type BloSvgFunction = (address: Address, uppercase?: boolean | null, size?: ValidSize) => string;
-export type BloImageFunction = (address: Address, uppercase?: boolean | null) => BloImage;
+export type BloFunction = (address: Address, options: BloOptions) => string;
+export type BloSvgFunction = (address: Address, options: BloOptions) => string;
+export type BloImageFunction = (address: Address, options: BloOptions) => BloImage;
 
 export type HslValues = {
   hue: number;        // 0-360
   saturation: number; // 0-100
   lightness: number;  // 0-100
 };
+
+export interface BloOptions {
+  size?: ValidSize;
+  uppercase?: boolean;
+  seed?: string;
+}

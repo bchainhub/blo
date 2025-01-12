@@ -21,7 +21,7 @@ const benchOptions = {
 
 describe("blockies benchmarks", () => {
   bench("blo", () => {
-    blo(address(), false, 64);
+    blo(address());
   }, benchOptions);
 
   bench("ethereum-blockies-base64", () => {

@@ -1,4 +1,4 @@
-import type { Address } from "./types";
+import type { Address, BloOptions } from "./types";
 
 import { randomPalette } from "./image";
 import { seedRandom } from "./random";
@@ -9,8 +9,9 @@ const PATH_START = '<path fill="hsl(';
 const PATH_MID = ')" d="';
 const PATH_END = '"/>';
 
-export function svg(address: Address, size: number) {
-  const random = seedRandom(address.toLowerCase());
+export function svg(address: Address, options: BloOptions = {}): string {
+  const { size = 64, seed } = options;
+  const random = seedRandom(seed || address.toLowerCase());
   const { background: b, primary: c, accent: s } = randomPalette(random);
 
   // Pre-allocate arrays for better performance
