@@ -203,3 +203,15 @@ blo is short for blockies, which is the name of [the original library](https://g
 ## License
 
 [CORE](LICENSE)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## Sponsor BlockchainHub
+
+BlockchainHub is a platform for building Open Source applications.
+
+[Sponsor us](https://github.com/sponsors/bchainhub) to support our work.
+
+Current GitHub Sponsors: [![GitHub Sponsors](https://img.shields.io/github/sponsors/bchainhub?label=Sponsors&logo=githubsponsors&color=EA4AAA)](https://github.com/sponsors/bchainhub)
