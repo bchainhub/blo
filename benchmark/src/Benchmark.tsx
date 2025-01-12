@@ -5,34 +5,38 @@ import { createIcon as blockiesCreateIcon } from "@download/blockies";
 import BlockiesSvgSync from "blockies-react-svg/dist/es/BlockiesSvgSync.mjs";
 import * as blockiesTs from "blockies-ts";
 import makeBlockie from "ethereum-blockies-base64";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import ReactBlockies from "react-blockies";
 import { Benchmark } from "react-component-benchmark";
 import { blo } from "../../src";
 
-const DEBUG = false;
-const debug = (...args: unknown[]) => {
-  if (DEBUG) {
-    console.log(...args);
-  }
-};
-
 const SAMPLES = 1000;
 
-const randomAddress = () => {
-  return `${
-    Array.from({ length: 44 }).map(() => {
-      const char = Math.floor(Math.random() * 16).toString(16);
-      return Math.random() > 0.5 ? char : char.toUpperCase();
-    }).join("")
-  }`;
-};
+// Generate a larger pool of unique addresses
+const addresses = Array.from({ length: SAMPLES * 10 }).map(() => {
+  const chars = '0123456789abcdefABCDEF';
+  return '0x' + Array.from({ length: 40 })
+    .map(() => chars[Math.floor(Math.random() * chars.length)])
+    .join('');
+});
 
-const addresses = Array.from({ length: SAMPLES * 10 }).map(randomAddress);
+// Shuffle the addresses array to ensure random distribution
+function shuffleAddresses() {
+  for (let i = addresses.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [addresses[i], addresses[j]] = [addresses[j], addresses[i]];
+  }
+}
 
-let i = 0;
+let addressIndex = 0;
 function nextAddress() {
-  return addresses[i = (i + 1) % SAMPLES] as string;
+  // Reset and reshuffle when we've used all addresses
+  if (addressIndex >= addresses.length) {
+    addressIndex = 0;
+    shuffleAddresses();
+  }
+  const address = addresses[addressIndex++];
+  return address;
 }
 
 // All benchmarks are rendering a 64x64 image on a @2x display,
@@ -121,6 +125,11 @@ export default function App() {
     Math.max(result?.rps ?? 0, best)
   ), 0);
 
+  // Shuffle addresses on initial load
+  useEffect(() => {
+    shuffleAddresses();
+  }, []);
+
   return (
     <>
       <style>{`
@@ -148,7 +157,12 @@ export default function App() {
           {Object.entries(BENCHMARKS).map((benchmark) => {
             const [name, Component] = benchmark;
             const result = results[name];
-            debug(`Processing result for ${name}:`, result);
+
+            // Create a wrapper component that forces new addresses
+            const BenchmarkWrapper = React.memo(function BenchmarkWrapper() {
+              const address = nextAddress();
+              return <Component address={address} />;
+            });
 
             return (
               <tr key={name}>
@@ -195,39 +209,23 @@ export default function App() {
                     <div className="benchmark">
                       <Benchmark
                         ref={refs[name]}
-                        component={Component}
-                        componentProps={{ address: nextAddress() }}
+                        component={BenchmarkWrapper}
                         onComplete={(benchResult: BenchmarkResult) => {
-                          debug(`Raw benchmark result for ${name}:`, benchResult);
 
-                          // Calculate RPS from total runtime and sample count
                           const totalTime = benchResult.endTime - benchResult.startTime;
                           const timePerSample = totalTime / benchResult.sampleCount;
 
-                          debug(`Time calculations for ${name}:`, {
-                            totalTime,
-                            timePerSample,
-                            sampleCount: benchResult.sampleCount
-                          });
-
                           if (timePerSample > 0) {
                             const rps = Math.round(1000 / timePerSample);
-                            debug(`Valid result for ${name}, RPS: ${rps}`);
 
-                            setResults(prevResults => {
-                              const newResults = {
-                                ...prevResults,
-                                [name]: {
-                                  ...benchResult,
-                                  mean: timePerSample,
-                                  rps
-                                }
-                              };
-                              debug(`Updated results for ${name}:`, newResults);
-                              return newResults;
-                            });
-                          } else {
-                            debug(`Invalid time per sample for ${name}:`, timePerSample);
+                            setResults(prevResults => ({
+                              ...prevResults,
+                              [name]: {
+                                ...benchResult,
+                                mean: timePerSample,
+                                rps
+                              }
+                            }));
                           }
                           setRunning(null);
                         }}
@@ -237,7 +235,9 @@ export default function App() {
                       />
                     </div>
                     <div className="sample">
-                      <Component address={addresses[0]} />
+                      <Component
+                        address="cb7147879011ea207df5b35a24ca6f0859dcfb145999"
+                      />
                     </div>
                   </div>
                 </td>
