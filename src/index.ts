@@ -14,7 +14,6 @@ export type {
 
 const DEFAULT_OPTIONS: BloOptions = {
   size: 64,
-  uppercase: undefined,
   seed: undefined
 };
 
@@ -24,12 +23,10 @@ export function blo(address: Address, options: BloOptions = {}): string {
 
 export function bloSvg(address: Address, options: BloOptions = {}): string {
   const opts = { ...DEFAULT_OPTIONS, ...options };
-  const processedAddress = opts.uppercase === undefined ? address : (opts.uppercase ? address.toUpperCase() : address.toLowerCase());
-  return svg(processedAddress, opts);
+  return svg(address, opts);
 }
 
 export function bloImage(address: Address, options: BloOptions = {}): BloImage {
   const opts = { ...DEFAULT_OPTIONS, ...options };
-  const processedAddress = opts.uppercase === undefined ? address : (opts.uppercase ? address.toUpperCase() : address.toLowerCase());
-  return image(processedAddress, opts);
+  return image(address, opts);
 }
