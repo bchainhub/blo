@@ -47,6 +47,5 @@ export type HslValues = {
 
 export interface BloOptions {
   size?: ValidSize;
-  uppercase?: boolean;
   seed?: string;
 }
