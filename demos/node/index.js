@@ -1,6 +1,7 @@
 import { bloImage } from "@blockchainhub/blo";
 
 const SQUARE_WIDTH = 3;
+const paletteKeys = ["background", "primary", "accent"];
 
 function renderImage([data, palette]) {
   let output = "";
@@ -8,9 +9,9 @@ function renderImage([data, palette]) {
 
   for (let i = 0; i < data.length; i++) {
     const color = hsl2rgb(
-      palette[data[i]][0],
-      palette[data[i]][1] / 100,
-      palette[data[i]][2] / 100,
+      palette[paletteKeys[data[i]]][0],
+      palette[paletteKeys[data[i]]][1] / 100,
+      palette[paletteKeys[data[i]]][2] / 100,
     );
 
     const [r, g, b] = color.map((c) => Math.floor(c * 255));
@@ -46,4 +47,4 @@ function hsl2rgb(h, s, l) {
   return [f(0), f(8), f(4)];
 }
 
-renderIcon("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045");
+renderIcon("cb7147879011ea207df5b35a24ca6f0859dcfb145999");

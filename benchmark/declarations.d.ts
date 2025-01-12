@@ -6,12 +6,19 @@ declare module "@download/blockies" {
   }): HTMLCanvasElement;
 }
 
+declare module "blockies-react-svg/dist/es/makeBlockiesUrl.mjs" {
+  export default function makeBlockiesUrl(seed: string, size: number, hasBackground: boolean, scale: number): string;
+}
+
 declare module "blockies-react-svg/dist/es/BlockiesSvgSync.mjs" {
-  export default function BlockiesSvgSync(props: {
+  import { ComponentType } from 'react';
+  interface Props {
     address: string;
     size: number;
     scale: number;
-  }): JSX.Element;
+  }
+  const BlockiesSvgSync: ComponentType<Props>;
+  export default BlockiesSvgSync;
 }
 
 declare module "react-blockies" {

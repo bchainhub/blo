@@ -1,60 +1,72 @@
-import type { BenchmarkRef, BenchResultsType } from "react-component-benchmark";
+import React from "react";
+import type { BenchmarkRef } from "react-component-benchmark";
 
 import { createIcon as blockiesCreateIcon } from "@download/blockies";
 import BlockiesSvgSync from "blockies-react-svg/dist/es/BlockiesSvgSync.mjs";
 import * as blockiesTs from "blockies-ts";
 import makeBlockie from "ethereum-blockies-base64";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import ReactBlockies from "react-blockies";
 import { Benchmark } from "react-component-benchmark";
 import { blo } from "../../src";
 
 const SAMPLES = 1000;
 
-const randomAddress = () => {
-  return `0x${
-    Array.from({ length: 40 }).map(() => {
-      const char = Math.floor(Math.random() * 16).toString(16);
-      return Math.random() > 0.5 ? char : char.toUpperCase();
-    }).join("")
-  }`;
-};
+// Generate a larger pool of unique addresses
+const addresses = Array.from({ length: SAMPLES * 10 }).map(() => {
+  const chars = '0123456789abcdefABCDEF';
+  return '0x' + Array.from({ length: 40 })
+    .map(() => chars[Math.floor(Math.random() * chars.length)])
+    .join('');
+});
 
-const addresses = Array.from({ length: SAMPLES * 10 }).map(randomAddress);
+// Shuffle the addresses array to ensure random distribution
+function shuffleAddresses() {
+  for (let i = addresses.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [addresses[i], addresses[j]] = [addresses[j], addresses[i]];
+  }
+}
 
-let i = 0;
+let addressIndex = 0;
 function nextAddress() {
-  return addresses[i = (i + 1) % SAMPLES] as `0x${string}`;
+  // Reset and reshuffle when we've used all addresses
+  if (addressIndex >= addresses.length) {
+    addressIndex = 0;
+    shuffleAddresses();
+  }
+  const address = addresses[addressIndex++];
+  return address;
 }
 
 // All benchmarks are rendering a 64x64 image on a @2x display,
 // which requires to render the raster images at 128x128.
 const BENCHMARKS: Record<
   string,
-  ({ address }: { address: `0x${string}` }) => JSX.Element
+  React.ComponentType<{ address: string }>
 > = {
-  "blo": ({ address }) => (
+  "@blockchainhub/blo": React.memo(({ address }) => (
     <img
       width={64}
       height={64}
       src={blo(address)}
     />
-  ),
-  "ethereum-blockies-base64": ({ address }) => (
+  )),
+  "ethereum-blockies-base64": React.memo(({ address }) => (
     <img
       width={64}
       height={64}
       src={makeBlockie(address)}
     />
-  ),
-  "blockies-react-svg": ({ address }) => (
+  )),
+  "blockies-react-svg": React.memo(({ address }) => (
     <BlockiesSvgSync
       size={8}
       scale={8}
       address={address}
     />
-  ),
-  "@download/blockies": ({ address }) => (
+  )),
+  "@download/blockies": React.memo(({ address }) => (
     <img
       width={64}
       height={64}
@@ -64,8 +76,8 @@ const BENCHMARKS: Record<
         size: 8,
       }).toDataURL()}
     />
-  ),
-  "blockies-ts": ({ address }) => (
+  )),
+  "blockies-ts": React.memo(({ address }) => (
     <img
       width={64}
       height={64}
@@ -75,8 +87,8 @@ const BENCHMARKS: Record<
         size: 8,
       }).toDataURL()}
     />
-  ),
-  "react-blockies": ({ address }) => (
+  )),
+  "react-blockies": React.memo(({ address }) => (
     // className is used to force the display size to 64x64
     <ReactBlockies
       className="react-blockies"
@@ -84,21 +96,21 @@ const BENCHMARKS: Record<
       scale={16}
       size={8}
     />
-  ),
+  )),
 } as const;
+
+interface BenchmarkResult {
+  startTime: number;
+  endTime: number;
+  runTime: number;
+  sampleCount: number;
+  samples: Array<{ start: number; end: number; }>;
+}
 
 export default function App() {
   const [results, setResults] = useState<
-    Record<
-      keyof typeof BENCHMARKS,
-      | null
-      | BenchResultsType & { rps: number }
-    >
-  >(
-    Object.fromEntries(
-      Object.keys(BENCHMARKS).map((key) => [key, null]),
-    ) as Record<keyof typeof BENCHMARKS, null>,
-  );
+    Record<string, null | BenchmarkResult & { rps: number }>
+  >({});
 
   const refs = Object.fromEntries(
     Object.keys(BENCHMARKS).map((name) => [
@@ -113,21 +125,45 @@ export default function App() {
     Math.max(result?.rps ?? 0, best)
   ), 0);
 
+  // Shuffle addresses on initial load
+  useEffect(() => {
+    shuffleAddresses();
+  }, []);
+
   return (
     <>
-      <style>{STYLES}</style>
+      <style>{`
+        ${STYLES}
+        .render-zone img,
+        .render-zone svg,
+        .render-zone canvas {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          image-rendering: pixelated;
+        }
+      `}</style>
       <table>
         <thead>
           <tr>
             <th></th>
             <th>Library</th>
-            <th colSpan={3}>Renders / sec</th>
+            <th colSpan={2}>Renders per second</th>
+            <th>Preview</th>
           </tr>
         </thead>
         <tbody>
           {Object.entries(BENCHMARKS).map((benchmark) => {
             const [name, Component] = benchmark;
-            const score = best ? (results[name]?.rps ?? 0) / best : 0;
+            const result = results[name];
+
+            // Create a wrapper component that forces new addresses
+            const BenchmarkWrapper = React.memo(function BenchmarkWrapper() {
+              const address = nextAddress();
+              return <Component address={address} />;
+            });
+
             return (
               <tr key={name}>
                 <td
@@ -137,11 +173,11 @@ export default function App() {
                 >
                   <div
                     style={{
-                      width: `${score * 100}px`,
+                      width: `${result?.rps ? (result.rps / best) * 100 : 0}px`,
                       height: "8px",
 
                       // 120 = green, 0 = red
-                      background: `hsl(${Math.round(score * 120)}, 50%, 70%)`,
+                      background: `hsl(${result?.rps ? Math.round((result.rps / best) * 120) : 0}, 50%, 70%)`,
                     }}
                   />
                 </td>
@@ -153,11 +189,7 @@ export default function App() {
                     minWidth: "100px",
                   }}
                 >
-                  {results[name]?.mean
-                    ? new Intl.NumberFormat("EN-us").format(
-                      Math.round(results[name]?.rps ?? 0),
-                    )
-                    : "-"}
+                  {result?.rps ? new Intl.NumberFormat("en-US").format(result.rps) : "-"}
                 </td>
                 <td>
                   <button
@@ -177,20 +209,35 @@ export default function App() {
                     <div className="benchmark">
                       <Benchmark
                         ref={refs[name]}
-                        component={() => <Component address={nextAddress()} />}
-                        onComplete={(result) => {
-                          setResults((r) => ({
-                            ...r,
-                            [name]: { ...result, rps: 1000 / result.mean },
-                          }));
+                        component={BenchmarkWrapper}
+                        onComplete={(benchResult: BenchmarkResult) => {
+
+                          const totalTime = benchResult.endTime - benchResult.startTime;
+                          const timePerSample = totalTime / benchResult.sampleCount;
+
+                          if (timePerSample > 0) {
+                            const rps = Math.round(1000 / timePerSample);
+
+                            setResults(prevResults => ({
+                              ...prevResults,
+                              [name]: {
+                                ...benchResult,
+                                mean: timePerSample,
+                                rps
+                              }
+                            }));
+                          }
                           setRunning(null);
                         }}
                         samples={SAMPLES}
                         type="mount"
+                        timeout={30000}
                       />
                     </div>
                     <div className="sample">
-                      <Component address="0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045" />
+                      <Component
+                        address="cb7147879011ea207df5b35a24ca6f0859dcfb145999"
+                      />
                     </div>
                   </div>
                 </td>

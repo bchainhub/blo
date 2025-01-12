@@ -1,49 +1,51 @@
-import type { Address, BloImage, BloImageData, Hsl, PaletteIndex } from "./types";
-
+import type { Address, BloImage, BloImageData, Hsl, Palette, BloOptions } from "./types";
 import { seedRandom } from "./random";
 
-// The random() calls must happen in this exact order:
-// 1. palette: main color (6 calls)
-// 2. palette: background (6 calls)
-// 3. palette: spot color (6 calls)
-// 4. image data (32 calls)
+// Pre-calculate constants
+const COLOR_THRESHOLD = 2.3;
+const SATURATION_BASE = 40;
+const SATURATION_RANGE = 60;
+const LIGHTNESS_DIVISOR = 25;
 
-export function image(address: Address): BloImage {
-  const random = seedRandom(address.toLowerCase());
+export function image(address: Address, options: BloOptions = {}): BloImage {
+  const { seed } = options;
+  const random = seedRandom(seed || address.toLowerCase());
   const palette = randomPalette(random);
   const data = randomImageData(random);
   return [data, palette];
 }
 
 export function randomImageData(random: () => number): BloImageData {
+  // Use a single allocation
   const data = new Uint8Array(32);
-  for (let i = 0; i < 32; i++) {
-    data[i] = Math.floor(
-      // background: 43% chances
-      // color:      43% chances
-      // spot:       13% chances
-      random() * 2.3,
-    ) as PaletteIndex; // guaranteed to be 0 | 1 | 2
+
+  // Unroll the loop for better performance
+  for (let i = 0; i < 32; i += 4) {
+    data[i] = Math.floor(random() * COLOR_THRESHOLD);
+    data[i + 1] = Math.floor(random() * COLOR_THRESHOLD);
+    data[i + 2] = Math.floor(random() * COLOR_THRESHOLD);
+    data[i + 3] = Math.floor(random() * COLOR_THRESHOLD);
   }
+
   return data;
 }
 
-export function randomPalette(random: () => number): [Hsl, Hsl, Hsl] {
-  // calls order is significant
-  const c = randomColor(random);
-  const b = randomColor(random);
-  const s = randomColor(random);
-  return [b, c, s];
+export function randomPalette(random: () => number): Palette {
+  return {
+    primary: randomColor(random),
+    background: randomColor(random),
+    accent: randomColor(random)
+  };
 }
 
 export function randomColor(rand: () => number): Hsl {
-  // Math.floor() calls omitted since Uint16Array() does it
-  return new Uint16Array([
-    // hue = 0 to 360 (whole color spectrum)
-    rand() * 360,
-    // saturation = 40 to 100 (avoid greyish colors)
-    40 + rand() * 60,
-    // lightness = 0 to 100 but probabilities are a bell curve around 50%
-    (rand() + rand() + rand() + rand()) * 25,
-  ]);
+  // Pre-allocate the array
+  const color = new Uint16Array(3);
+
+  // Optimize calculations
+  color[0] = rand() * 360;
+  color[1] = SATURATION_BASE + (rand() * SATURATION_RANGE);
+  color[2] = (rand() + rand() + rand() + rand()) * LIGHTNESS_DIVISOR;
+
+  return color;
 }

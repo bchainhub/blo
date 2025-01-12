@@ -6,7 +6,7 @@
     "start": "bun index.ts"
   },
   "dependencies": {
-    "blo": "file:../.."
+    "@blockchainhub/blo": "file:../.."
   },
   "devDependencies": {
     "bun-types": "latest"
