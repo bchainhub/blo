@@ -4,7 +4,7 @@ import { useState } from "react";
 export default function App() {
   const [size, setSize] = useState(128);
   const [address, setAddress] = useState(
-    "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "cb7147879011ea207df5b35a24ca6f0859dcfb145999",
   );
   return (
     <>
@@ -89,14 +89,12 @@ export default function App() {
             <span style={{ whiteSpace: "nowrap" }}>size: {size}</span>
           </div>
         </div>
-        {address.startsWith("0x") && (
           <img
             alt="blo"
             width={size}
             height={size}
-            src={blo(address as `0x${string}`)}
+            src={blo(address as string)}
           />
-        )}
       </div>
     </>
   );

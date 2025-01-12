@@ -47,4 +47,4 @@ function hsl2rgb(h, s, l) {
   return [f(0), f(8), f(4)];
 }
 
-renderIcon("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045");
+renderIcon("cb7147879011ea207df5b35a24ca6f0859dcfb145999");

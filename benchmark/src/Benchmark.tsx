@@ -1,3 +1,4 @@
+import React from "react";
 import type { BenchmarkRef, BenchResultsType } from "react-component-benchmark";
 
 import { createIcon as blockiesCreateIcon } from "@download/blockies";
@@ -12,8 +13,8 @@ import { blo } from "../../src";
 const SAMPLES = 1000;
 
 const randomAddress = () => {
-  return `0x${
-    Array.from({ length: 40 }).map(() => {
+  return `${
+    Array.from({ length: 44 }).map(() => {
       const char = Math.floor(Math.random() * 16).toString(16);
       return Math.random() > 0.5 ? char : char.toUpperCase();
     }).join("")
@@ -24,20 +25,22 @@ const addresses = Array.from({ length: SAMPLES * 10 }).map(randomAddress);
 
 let i = 0;
 function nextAddress() {
-  return addresses[i = (i + 1) % SAMPLES] as `0x${string}`;
+  return addresses[i = (i + 1) % SAMPLES] as string;
 }
 
 // All benchmarks are rendering a 64x64 image on a @2x display,
 // which requires to render the raster images at 128x128.
 const BENCHMARKS: Record<
   string,
-  ({ address }: { address: `0x${string}` }) => JSX.Element
+  ({ address }: { address: string }) => React.JSX.Element
 > = {
   "blo": ({ address }) => (
     <img
       width={64}
       height={64}
       src={blo(address)}
+      alt={`Blockies for ${address}`}
+      style={{ imageRendering: "pixelated" }}
     />
   ),
   "ethereum-blockies-base64": ({ address }) => (
@@ -115,19 +118,33 @@ export default function App() {
 
   return (
     <>
-      <style>{STYLES}</style>
+      <style>{`
+        ${STYLES}
+        .render-zone img,
+        .render-zone svg,
+        .render-zone canvas {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          image-rendering: pixelated;
+        }
+      `}</style>
       <table>
         <thead>
           <tr>
             <th></th>
             <th>Library</th>
-            <th colSpan={3}>Renders / sec</th>
+            <th colSpan={3}>Renders per second</th>
           </tr>
         </thead>
         <tbody>
           {Object.entries(BENCHMARKS).map((benchmark) => {
             const [name, Component] = benchmark;
-            const score = best ? (results[name]?.rps ?? 0) / best : 0;
+            const result = results[name];
+            const rps = result?.mean ? Math.round(1000 / result.mean) : 0;
+            const score = best > 0 ? (rps / best) : 0;
+
             return (
               <tr key={name}>
                 <td
@@ -153,10 +170,8 @@ export default function App() {
                     minWidth: "100px",
                   }}
                 >
-                  {results[name]?.mean
-                    ? new Intl.NumberFormat("EN-us").format(
-                      Math.round(results[name]?.rps ?? 0),
-                    )
+                  {rps > 0
+                    ? new Intl.NumberFormat("en-US").format(rps)
                     : "-"}
                 </td>
                 <td>
@@ -179,18 +194,22 @@ export default function App() {
                         ref={refs[name]}
                         component={() => <Component address={nextAddress()} />}
                         onComplete={(result) => {
-                          setResults((r) => ({
-                            ...r,
-                            [name]: { ...result, rps: 1000 / result.mean },
-                          }));
+                          if (result.mean > 0) {
+                            const rps = 1000 / result.mean;
+                            setResults((r) => ({
+                              ...r,
+                              [name]: { ...result, rps },
+                            }));
+                          }
                           setRunning(null);
                         }}
                         samples={SAMPLES}
                         type="mount"
+                        timeout={20000}
                       />
                     </div>
                     <div className="sample">
-                      <Component address="0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045" />
+                      <Component address="cb7147879011ea207df5b35a24ca6f0859dcfb145999" />
                     </div>
                   </div>
                 </td>

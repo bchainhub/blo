@@ -35,9 +35,9 @@ export type ValidSize = number;
 // export type ValidSize = 16 | 32 | 64 | 128 | 256;
 
 // Function signatures with improved type safety
-export type BloFunction = (address: Address, uppercase?: boolean, size?: ValidSize) => string;
-export type BloSvgFunction = (address: Address, uppercase?: boolean, size?: ValidSize) => string;
-export type BloImageFunction = (address: Address, uppercase?: boolean) => BloImage;
+export type BloFunction = (address: Address, uppercase?: boolean | null, size?: ValidSize) => string;
+export type BloSvgFunction = (address: Address, uppercase?: boolean | null, size?: ValidSize) => string;
+export type BloImageFunction = (address: Address, uppercase?: boolean | null) => BloImage;
 
 export type HslValues = {
   hue: number;        // 0-360
