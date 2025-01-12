@@ -1,5 +1,4 @@
 import type { Address, BloImage } from "./types";
-
 import { image } from "./image";
 import { svg } from "./svg";
 
