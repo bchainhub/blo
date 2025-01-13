@@ -1,10 +1,11 @@
 {
   "name": "@blockchainhub/blo",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "license": "CORE",
   "author": "Pierre Bertet <hi@bpier.re>",
   "contributors": [
-    "Blockchain Hub @bchainhub"
+    "Blockchain Hub @bchainhub",
+    "Rastislav Vašička @rastislavcore"
   ],
   "description": "blo is a small and fast library to generate Blockchain identicons.",
   "keywords": [
@@ -33,13 +34,11 @@
   },
   "scripts": {
     "dev": "vite ./demos/react",
-    "build": "tsc && vite build",
+    "build": "tsc",
     "ncu-all": "ncu -u && cd demos/bun && ncu -u && cd ../node && ncu -u && cd ../react && ncu -u && cd ../../benchmark && ncu -u"
   },
   "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
+    "dist"
   ],
   "sideEffects": false,
   "devDependencies": {
