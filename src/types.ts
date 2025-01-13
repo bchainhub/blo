@@ -1,9 +1,9 @@
 // The data structure needed to render an icon.
-export type BloImage = [BloImageData, Palette];
+export type Address = string;
 
 // 4x8 grid of the image left side, as 32 PaletteIndex items.
 // The right side is omitted as it's a mirror of the left side.
-export type BloImageData = Uint8Array;
+export type BloImage = [Uint8Array, Palette];
 
 // Colors used by a given icon.
 export type Palette = {
@@ -26,9 +26,6 @@ export type PaletteIndex = 0 | 1 | 2;
 // [2]: 0-100 (lightness)
 export type Hsl = Uint16Array;
 
-// An Ethereum address.
-export type Address = string;
-
 // Add size constraints
 export type ValidSize = number;
 // Or more strictly:
@@ -46,6 +43,6 @@ export type HslValues = {
 };
 
 export interface BloOptions {
-  size?: ValidSize;
+  size?: number;
   seed?: string;
 }

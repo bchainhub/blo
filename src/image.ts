@@ -1,4 +1,4 @@
-import type { Address, BloImage, BloImageData, Hsl, Palette, BloOptions } from "./types";
+import type { Address, BloImage, BloOptions, Hsl, Palette } from "./types";
 import { seedRandom } from "./random";
 
 // Pre-calculate constants
@@ -15,7 +15,7 @@ export function image(address: Address, options: BloOptions = {}): BloImage {
   return [data, palette];
 }
 
-export function randomImageData(random: () => number): BloImageData {
+export function randomImageData(random: () => number): Uint8Array {
   // Use a single allocation
   const data = new Uint8Array(32);
 
