@@ -3,20 +3,22 @@ export type Address = string;
 
 // 4x8 grid of the image left side, as 32 PaletteIndex items.
 // The right side is omitted as it's a mirror of the left side.
-export type BloImage = [Uint8Array, Palette];
+export type BloImage = [BloImageData, Palette];
+
+export type BloImageData = Uint8Array;
 
 // Colors used by a given icon.
 export type Palette = {
-  background: Hsl;
-  primary: Hsl;
-  accent: Hsl;
+	background: Hsl;
+	primary: Hsl;
+	accent: Hsl;
 };
 
 // Or using const for better type inference
 export const PaletteIndexes = {
-  BACKGROUND: 0,
-  PRIMARY: 1,
-  ACCENT: 2,
+	BACKGROUND: 0,
+	PRIMARY: 1,
+	ACCENT: 2,
 } as const;
 export type PaletteIndex = 0 | 1 | 2;
 
@@ -37,12 +39,18 @@ export type BloSvgFunction = (address: Address, options: BloOptions) => string;
 export type BloImageFunction = (address: Address, options: BloOptions) => BloImage;
 
 export type HslValues = {
-  hue: number;        // 0-360
-  saturation: number; // 0-100
-  lightness: number;  // 0-100
+	hue: number;        // 0-360
+	saturation: number; // 0-100
+	lightness: number;  // 0-100
 };
 
 export interface BloOptions {
-  size?: number;
-  seed?: string;
+	size?: number;
+	seed?: string;
 }
+
+// Add function types
+export type SeedRandom = (s: string) => () => number;
+export type RandomColor = (r: () => number) => Hsl;
+export type RandomPalette = (r: () => number) => Palette;
+export type ImageFunction = (a: Address, o: BloOptions) => BloImage;
