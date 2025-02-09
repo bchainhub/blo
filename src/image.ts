@@ -1,5 +1,5 @@
-import type { Address, BloImage, BloOptions, Hsl, Palette } from "./types";
-import { seedRandom } from "./random";
+import type { Address, BloImage, BloOptions, Hsl, Palette } from "./types.js";
+import { seedRandom } from "./random.js";
 
 // Pre-calculate constants
 const COLOR_THRESHOLD = 2.3;

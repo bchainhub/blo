@@ -1,6 +1,6 @@
 {
   "name": "@blockchainhub/blo",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "license": "CORE",
   "author": "Pierre Bertet <hi@bpier.re>",
   "contributors": [
@@ -27,9 +27,8 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {

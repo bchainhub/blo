@@ -1,7 +1,7 @@
-import type { Address, BloOptions } from "./types";
+import type { Address, BloOptions } from "./types.js";
 
-import { randomPalette } from "./image";
-import { seedRandom } from "./random";
+import { randomPalette } from "./image.js";
+import { seedRandom } from "./random.js";
 
 export const svg = (a: Address, o: BloOptions): string => {
 	const r = seedRandom(o.seed || a);
